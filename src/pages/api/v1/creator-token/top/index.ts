@@ -18,18 +18,19 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET') {
-        const { data: userProfiles, error } = await supabase
-        .from('user_profiles') // Replace 'user_profiles' with your actual table name
-        .select('*')
-        // .eq('verified', true)
-        // .eq('is_party', false)
-        // // .eq('is_demo', false)
-        .eq('is_secondary_stream', false);  
+        const userProfiles = [];
+        // const { data: userProfiles, error } = await supabase
+        // .from('user_profiles') // Replace 'user_profiles' with your actual table name
+        // .select('*')
+        // // .eq('verified', true)
+        // // .eq('is_party', false)
+        // // // .eq('is_demo', false)
+        // .eq('is_secondary_stream', false);  
 
-        if (error) {
-            // Handle the error
-            return res.status(500).json({ error: 'An unexpected error occurred' });
-        }
+        // if (error) {
+        //     // Handle the error
+        //     return res.status(500).json({ error: 'An unexpected error occurred' });
+        // }
         const topCreatorTokenResponse = {
             creator_tokens: [...userProfiles,]
         };
