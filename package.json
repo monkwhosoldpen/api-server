@@ -52,6 +52,7 @@
     "eslint": "^8.28.0",
     "eslint-config-next": "^13.0.5",
     "postcss": "^8.4.19",
+    "pocketbase": "*",
     "tailwindcss": "^3.2.4",
     "typescript": "5.3.3"
   }
