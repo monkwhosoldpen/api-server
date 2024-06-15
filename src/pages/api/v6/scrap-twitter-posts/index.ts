@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             });
 
             const cleanerUserProfiles = profileObjects.filter(prof => Boolean(prof?.twitter_username));
-            const baseUrl = 'https://api.netaconnect.com';
+            const baseUrl = 'https://api.fixd.ai';
 
             [...cleanerUserProfiles].forEach(profile => {
                 if (profile.twitter_username) {

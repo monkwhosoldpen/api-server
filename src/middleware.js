@@ -5,8 +5,8 @@ export function middleware(req) {
     const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:3001',
-        'https://www.netaconnect.com',
-        'https://api.netaconnect.com',
+        'https://www.fixd.ai',
+        'https://api.fixd.ai',
     ];
 
     // Check the Origin header against the allowed origins

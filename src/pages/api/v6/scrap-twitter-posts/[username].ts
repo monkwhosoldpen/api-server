@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // Note: Adjust parameters according to the actual API capabilities for batching and date filtering
             const timeline = await rettiwt.user.timeline(userId, 1);
 
-            const baseUrl = 'https://api.netaconnect.com';
+            const baseUrl = 'https://api.fixd.ai';
 
             [...timeline.list].forEach(tweet => {
                 const { id, fullText, createdAt } = tweet;

@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 async function sendNotificationAsync(data) {
   // Placeholder for your notification API call logic
   // For example:
-  await fetch('https://push.netaconnect.com/api/push', { method: 'GET' });
+  await fetch('https://push.fixd.ai/api/push', { method: 'GET' });
   console.log("Sending notification with data:", data);
 }
 

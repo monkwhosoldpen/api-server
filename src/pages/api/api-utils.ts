@@ -13,7 +13,7 @@ export const SESSION_LENGTH_IN_DAYS = 7;
 export const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://www.netaconnect.com',
+    'https://www.fixd.ai',
 ];
 
 export function decodeToken(token) {
