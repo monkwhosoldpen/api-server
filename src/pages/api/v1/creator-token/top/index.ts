@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'letmeenter@12345');
+    // await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'letmeenter@12345');
 
     if (req.method === 'GET') {
         const userProfiles = [{}, {}, {}];
