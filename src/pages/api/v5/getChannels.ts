@@ -1,3 +1,4 @@
+import { joinedChannelsData } from "../../../data/mockdata";
 import { allowedOrigins, decodeToken, getUserDataByUId, supabase } from "../api-utils";
 
 export default async function handler(req, res) {
@@ -60,10 +61,8 @@ export default async function handler(req, res) {
                 read: ele.latest_message ? userData.notifications_last_opened >= ele.latest_message?.timestamp : true // Set read based on timestamp comparison
             }));
 
-            // console.log(my_channels[0])
-
             const topCreatorTokenResponse = {
-                creator_tokens: my_channels,
+                creator_tokens: joinedChannelsData,
             };
             res.status(200).json(topCreatorTokenResponse);
         }
