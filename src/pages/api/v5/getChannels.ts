@@ -68,7 +68,7 @@ export default async function handler(req, res) {
         }
         else {
             const topCreatorTokenResponse = {
-                creator_tokens: [],
+                creator_tokens: joinedChannelsData,
             };
             res.status(200).json(topCreatorTokenResponse);
         }
