@@ -49,10 +49,10 @@ export default async function handler(req, res) {
         // Handle GET request
         const authHeader = req.headers.authorization;
         if (!authHeader) {
-            res.status(200).json([sampleNotification]);
+            res.status(200).json(notificationsData);
         }
         else {
-            res.status(200).json([sampleNotification]);
+            res.status(200).json(notificationsData);
         }
     }
     else {

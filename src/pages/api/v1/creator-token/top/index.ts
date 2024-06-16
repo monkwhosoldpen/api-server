@@ -1,4 +1,5 @@
 import { allowedOrigins, supabase } from "@pages/api/api-utils";
+import { allNFTSData1 } from "../../../../../data/mockdata";
 // import PocketBase from 'pocketbase';
 // const pb = new PocketBase('https://grew-faster.pockethost.io');
 
@@ -22,14 +23,7 @@ export default async function handler(req, res) {
     // await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'letmeenter@12345');
 
     if (req.method === 'GET') {
-        const userProfiles = [
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
-            {}, {}, {}, {}, {}, {}, {}, {}, {}
-        ];
+        const userProfiles = allNFTSData1;
         // const resultList = await pb.collection('goats').getList(1, 50, {
         //     filter: 'created >= "2022-01-01 00:00:00" && someField1 != someField2',
         // });
