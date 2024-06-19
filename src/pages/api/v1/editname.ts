@@ -12,7 +12,7 @@ export default async function handler(
             // If userData is null, it means the user is not found in Supabase
             const userResponse = {
                 data: {
-                    profile: { ...mockUserMe.data.profile, ...userData },
+                    // profile: { ...mockUserMe.data.profile, ...userData },
                 }
             };
             return res.status(200).json(userResponse);
