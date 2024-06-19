@@ -1,4 +1,4 @@
-import { allowedOrigins, decodeToken, getUserDataByUId } from '../api-utils';
+import { allowedOrigins, getUser, supabaseAnon } from '../api-utils';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -18,46 +18,48 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "GET") {
-        const authHeader = req.headers.authorization;
-        const accessToken = authHeader.split(" ")[1];
 
-        const payload = decodeToken(accessToken);
-        const uid = payload.did;
-        const userData = await getUserDataByUId(uid);
+        const user: any = await getUser(req);
+        const user_metadata = user?.user_metadata;
 
-        // If userData is null, it means the user is not found
-        const user = userData || {};
+        if (user) {
+            const { data: follows, error: supabaseError } = await supabaseAnon
+                .from('user_follows')
+                .select('followee_id')
+                .eq('follower_id', user.id);
 
-        if (!user) {
-            return res.status(500).json({ error: 'No object found' });
+            if (supabaseError) {
+                console.error('Supabase error:', supabaseError);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            if (!follows) {
+                console.error('No data found in follows');
+                return res.status(404).json({ error: 'No data found' });
+            }
+            const follows_ = follows.map((usernameObj) => (usernameObj.followee_id));
+
+            const response = {
+                data: {
+                    profile: { ...user, user_metadata },
+                    follows: follows_
+                },
+            };
+            return res.status(200).json(response);
         }
-
-        let follows = [];
-        let joined_channels = [];
-
-        if (user.follows && user.follows.length > 0) {
-            follows = user.follows.map((profileId) => ({ profile_id: profileId }));
-            joined_channels = user.follows.map((channel_id) => ({ channel_id: channel_id }));
+        else {
+            const response = {
+                data: {
+                    profile: {},
+                    follows: []
+                },
+            };
+            return res.status(200).json(response);
         }
-
-        delete user['following_count'];
-        delete user['followers_count'];
-
-        // Constructing the response structure with the modified follows array
-        const response = {
-            data: {
-                profile: { ...user },
-                followers_count: 5000,
-                following_count: 500,
-                joined_channels: joined_channels,
-                follows: follows, // Use the modified array of objects
-            },
-        };
-        return res.status(200).json(response);
     }
     else if (req.method === "POST") {
-          // Constructing the response structure
-          const response = {
+        // Constructing the response structure
+        const response = {
             data: {
                 profile: { ...({} || {}) },
                 // Add more properties here if needed
@@ -68,5 +70,4 @@ export default async function handler(req, res) {
     else {
         return res.status(405).json({ error: 'Method not allowed' });
     }
-  }
-  
+}

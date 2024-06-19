@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { allowedOrigins, decodeAndVerifyToken, decodeToken, generateDIDProfileId, supabase } from '../../../api-utils';
+import { allowedOrigins } from '../../../api-utils';
 import { pushMockData } from '../../../../../data/mockdata';
 
 export default async function handler(req, res) {
@@ -27,9 +27,9 @@ export default async function handler(req, res) {
         // const decodedPayload = decodeToken(accessToken);
         // console.log(decodedPayload);
 
-        const payload = decodeToken(accessToken);
-        const uid = payload.did;
-        console.log(uid);
+        // const payload = decodeToken(accessToken);
+        // const uid = payload.did;
+        // console.log(uid);
 
         // const settingsToUpdate = req.body; // Contains the dynamic settings
 
@@ -48,9 +48,9 @@ export default async function handler(req, res) {
         // const decodedPayload = decodeToken(accessToken);
         // console.log(decodedPayload);
 
-        const payload = decodeToken(accessToken);
-        const uid = payload.did;
-        console.log(uid);
+        // const payload = decodeToken(accessToken);
+        // const uid = payload.did;
+        // console.log(uid);
 
         // // Fetch user settings based on the UID from the user_settings table
         // const { data: userSettings, error } = await supabase

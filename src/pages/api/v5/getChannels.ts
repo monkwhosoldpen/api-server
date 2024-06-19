@@ -1,5 +1,5 @@
-import { joinedChannelsData } from "../../../data/mockdata";
-import { allowedOrigins, decodeToken, getUserDataByUId, supabase } from "../api-utils";
+import { joinedChannelsData } from '../../../data/mockdata';
+import { allowedOrigins, getUser, supabaseAnon } from '../api-utils';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -20,49 +20,30 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
 
-        let my_channels = [];
-        const authHeader = req.headers.authorization;
+        const user: any = await getUser(req);
 
-        if (authHeader) {
+        if (user?.id) {
+            const { data: follows, error: supabaseError } = await supabaseAnon
+                .from('user_follows')
+                .select('followee_id')
+                .eq('follower_id', user.id);
 
-            const accessToken = authHeader.split(" ")[1];
-
-            const payload = decodeToken(accessToken);
-            const uid = payload.did;
-            const userData = await getUserDataByUId(uid);
-            // console.log(userData.notifications_last_opened);
-
-            try {
-                const { data, error } = await supabase.rpc('get_following_profiles_by_uid', {
-                    uid_param: uid
-                });
-                if (error) {
-                    console.error("Error fetching user data with follow counts:", error.message);
-                }
-                else if (!data) {
-                    console.error("No data found for uid:", uid);
-                }
-                my_channels = (data || []).map(ele => {
-                    return {
-                        ...ele,
-                        tags: [
-                            'joined',
-                        ]
-                    }
-                });
-            }
-            catch (error) {
-                console.error("An error occurred while fetching user data with follow counts:", error.message);
+            if (supabaseError) {
+                console.error('Supabase error:', supabaseError);
+                return res.status(500).json({ error: 'Internal Server Error' });
             }
 
-            my_channels = (my_channels || []).map(ele => ({
-                ...ele,
-                tags: ['joined'],
-                read: ele.latest_message ? userData.notifications_last_opened >= ele.latest_message?.timestamp : true // Set read based on timestamp comparison
+            if (!follows) {
+                console.error('No data found in follows');
+                return res.status(404).json({ error: 'No data found' });
+            }
+            const follows_ = follows.map((usernameObj) => ({
+                ...joinedChannelsData[0],
+                username: usernameObj.followee_id,
             }));
-
             const topCreatorTokenResponse = {
-                creator_tokens: joinedChannelsData,
+                creator_tokens: follows_,
+                follows: follows_
             };
             res.status(200).json(topCreatorTokenResponse);
         }
@@ -72,6 +53,16 @@ export default async function handler(req, res) {
             };
             res.status(200).json(topCreatorTokenResponse);
         }
+    }
+    else if (req.method === "POST") {
+        // Constructing the response structure
+        const response = {
+            data: {
+                profile: { ...({} || {}) },
+                // Add more properties here if needed
+            },
+        };
+        return res.status(200).json(response);
     }
     else {
         return res.status(405).json({ error: 'Method not allowed' });

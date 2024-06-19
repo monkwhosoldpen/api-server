@@ -1,4 +1,7 @@
-import { allowedOrigins, supabase } from "@pages/api/api-utils";
+import { allowedOrigins } from "@pages/api/api-utils";
+import { allNFTSData1 } from "../../../../../data/mockdata";
+import PocketBase from 'pocketbase';
+const pb = new PocketBase('https://fixdpocketbase.pockethost.io');
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -17,19 +20,32 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    if (req.method === 'GET') {
-        const { data: userProfiles, error } = await supabase
-        .from('user_profiles') // Replace 'user_profiles' with your actual table name
-        .select('*')
-        .eq('verified', true)
-        .eq('is_party', true);
+    // await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'Letmeenter@12345');
 
-        if (error) {
-            // Handle the error
-            return res.status(500).json({ error: 'An unexpected error occurred' });
-        }
+    if (req.method === 'GET') {
+        const userProfiles = allNFTSData1;
+        const resultList = await pb.collection('goats').getList(1, 50, {
+        });
+        
+        // you can also fetch all records at once via getFullList
+        const records = await pb.collection('goats').getFullList({
+            sort: '-created',
+        });
+        
+        // const { data: userProfiles, error } = await supabase
+        // .from('user_profiles') // Replace 'user_profiles' with your actual table name
+        // .select('*')
+        // // .eq('verified', true)
+        // // .eq('is_party', false)
+        // // // .eq('is_demo', false)
+        // .eq('is_secondary_stream', false);
+
+        // if (error) {
+        //     // Handle the error
+        //     return res.status(500).json({ error: 'An unexpected error occurred' });
+        // }
         const topCreatorTokenResponse = {
-            creator_tokens: userProfiles
+            creator_tokens: [...records || [],]
         };
         res.status(200).json(topCreatorTokenResponse);
     }

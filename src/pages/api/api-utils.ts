@@ -1,12 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
-// import { createHash } from "crypto";
-// import { magic } from "./v1/magic";
 import jwt from "jsonwebtoken";
+import { mockUser, mockUserMe } from "../../data/mockdata";
 
-const supabaseUrl: any = "https://cydjretpcgmuezpkbkql.supabase.co";
-const supabaseKey: any = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5ZGpyZXRwY2dtdWV6cGtia3FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDYxMTkxOTEsImV4cCI6MjAyMTY5NTE5MX0.oXmm_fYwbkvK1ezeh8Ns6MlDPNYP1h7w6wr9hQ3aXdA";
+const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://pylhvrqhogloubzygehi.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bGh2cnFob2dsb3VienlnZWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg0ODU5NTEsImV4cCI6MjAzNDA2MTk1MX0.BVqMLmZf_6_aPWGt59EpC9oLvkVmAFQ_6jmgVSjdlWo';
+const service_role_key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bGh2cnFob2dsb3VienlnZWhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxODQ4NTk1MSwiZXhwIjoyMDM0MDYxOTUxfQ.cqA7R4vXx13pHCwK1Duy9MNvm53BaVuVQGYJn64Rbek';
+export const JWT_SECRET = process.env.NEXT_PUBLIC_SUPABASE_JWT_SECRET || 'oGxKu10cXVoxAnz/tDPiAC30fi58nNtMb2Dn5AiqyYwWwdvbi8MqWhct5KubflaBTvsU77az1+mgoAwN6cxPxg==';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabase_url, service_role_key);
+export const supabaseAnon = createClient(supabase_url, supabaseKey);
 
 export const SESSION_LENGTH_IN_DAYS = 7;
 
@@ -34,8 +36,6 @@ export function generateDIDProfileId(user: any): string | any {
     }
 }
 
-export const JWT_SECRET = "your_default_jwt_secret_here";
-
 export function generateAndVerifyToken(payload: any): string {
     try {
         const token = jwt.sign(payload, JWT_SECRET);
@@ -43,6 +43,21 @@ export function generateAndVerifyToken(payload: any): string {
     } catch (error) {
         throw error;
     }
+}
+
+export async function getUserProfileDataByUsername(username) {
+    const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('username', username)
+        .single();
+
+    if (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+
+    return data;
 }
 
 export function decodeAndVerifyToken(token: string): any {
@@ -61,7 +76,6 @@ export async function getUserDataByUId(uid) {
     }
     else {
         try {
-            // console.log(uid);
             const { data, error } = await supabase.rpc('get_user_profile_with_follow_counts_by_uid', {
                 uid_param: uid
             });
@@ -85,99 +99,21 @@ export async function getUserDataByUId(uid) {
     return userData;
 }
 
-export async function UpdateUserInfo(req) {
-    try {
-        const authHeader = req.headers.authorization;
-        const accessToken = authHeader.split(" ")[1];
-
-        // console.log(accessToken);
-        // const decodedPayload = decodeToken(accessToken);
-        // console.log(decodedPayload);
-
-        const payload = decodeToken(accessToken);
-        const uid = payload.did;
-        console.log(uid);
-
-        // const authHeader = req.headers.authorization;
-        // const accessToken = authHeader.split(" ")[1];
-        // const payload = decodeAndVerifyToken(accessToken);
-        // const uid = generateDIDProfileId(payload);
-        const existingData = await getUserDataByUId(uid);
-
-        // const authHeader = req.headers.authorization;
-
-        // const accessToken = authHeader.split(" ")[1];
-        // const payload = decodeAndVerifyToken(accessToken);
-        // const uid = generateDIDProfileId(payload);
-        // const existingData = await getUserDataByUId(uid);
-
-        const requestBody = req.body;
-
-        // Step 2: Merge the new data with existing user data
-        const updatedUserData = {
-            ...existingData,
-            ...requestBody,
-            uid
-        };
-
-        delete updatedUserData['followers_count'];
-        delete updatedUserData['following_count'];
-        delete updatedUserData['follows'];
-
-        const { data, error } = await supabase
-            .from("user_profiles")
-            .upsert([updatedUserData], { onConflict: ['uid'] } as any);
-
-        if (error) {
-            console.error("Error upserting user data:", error);
-            return null;
-        }
-
-        console.log("User data upserted successfully:");
-        return data ? data[0] : null;
-
-    } catch (error) {
-        console.error("An unexpected error occurred:", error);
+export async function getUser(req) {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        console.error("Invalid request: token is missing.");
         return null;
     }
+    const { data, error } = await supabase.auth.getUser(token);
+    return data?.user;
 }
 
-
-
+export async function UpdateUserInfo(req) {
+}
 
 export async function saveUserToDB(didProfileId) {
-    // const currentDate = new Date().toISOString();
-    const userProfile = {
-        uid: didProfileId
-    };
-    try {
-        // Attempt to insert the user data with a loop to handle conflicts
-        let inserted = false;
-        let insertAttempts = 0;
-
-        while (!inserted && insertAttempts <= 2) {
-            try {
-                const { data, error } = await supabase
-                    .from('user_profiles')
-                    .upsert([userProfile], { onConflict: ['uid'] } as any);
-
-                if (error) {
-                    console.log("Error upserting user:", error);
-                } else {
-                    console.log("User inserted:", data);
-                    inserted = true;
-                }
-            } catch (error) {
-                console.log("Conflict detected. Generating a new profile ID.");
-                // Generate a new profile ID here and update userProfile.uid
-                insertAttempts++;
-            }
-        }
-    } catch (error) {
-        console.log("An unexpected error occurred:", error);
-    }
 }
-
 
 export function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

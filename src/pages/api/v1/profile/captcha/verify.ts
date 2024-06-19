@@ -1,8 +1,7 @@
-import { UpdateUserInfo, allowedOrigins } from "../../../api-utils";
+import { allowedOrigins, getUser, supabase } from "../../../api-utils";
 const { verify } = require('hcaptcha');
 
 export default async function handler(req, res) {
-    
     const origin = req.headers.origin;
 
     // Set CORS headers
@@ -18,37 +17,53 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
     if (req.method === "POST") {
+        try {
+            const { hcaptcha_response_token } = req.body;
 
-        const captcha_completed_at = new Date().toISOString();
+            const secret = 'ES_558da93ae313421d91365243b98f0690';
+            const token = hcaptcha_response_token;
 
-        const { hcaptcha_response_token } = req.body;
-
-        const secret = 'ES_558da93ae313421d91365243b98f0690';
-        console.log("TODO: Secret here.");
-        const token = hcaptcha_response_token;
-
-        verify(secret, token)
-            .then((data) => {
-                if (data.success === true) {
-                    console.log('success!', data);
-                } else {
-                    console.log('verification failed');
-                }
-            })
-            .catch(console.error);
-
-        req.body = { ...req.body, captcha_completed_at };
-        const userData = await UpdateUserInfo(req);
-        // If userData is null, it means the user is not found in Supabase
-        const userResponse = {
-            data: {
-                profile: userData
+            // Verify captcha
+            const captchaData = await verify(secret, token);
+            if (!captchaData.success) {
+                return res.status(400).json({ error: 'Captcha verification failed' });
             }
-        };
-        return res.status(200).json(userResponse);
-    }
-    else {
+
+            const captcha_completed_at = new Date().toISOString();
+
+            // Fetch user data
+            const userDataRaw = await getUser(req);
+            const id = userDataRaw.id;
+
+            // Update user metadata
+            const { data: user, error } = await supabase.auth.admin.updateUserById(
+                id,
+                {
+                    user_metadata: {
+                        captcha_completed_at: captcha_completed_at,
+                    }
+                }
+            );
+
+            if (error) {
+                return res.status(500).json({ error: 'Failed to update user metadata' });
+            }
+
+            // Fetch latest user data
+            const userDataRawLatest = await getUser(req);
+
+            const userResponse = {
+                data: {
+                    profile: userDataRawLatest
+                }
+            };
+            return res.status(200).json(userResponse);
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    } else {
         return res.status(405).json({ error: 'Method not allowed' });
     }
-  }
-  
+}

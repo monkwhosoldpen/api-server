@@ -1,4 +1,4 @@
-import { allowedOrigins, decodeToken, getUserDataByUId, supabase } from "@pages/api/api-utils";
+import { allowedOrigins } from "@pages/api/api-utils";
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -20,29 +20,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
 
     const { channelId } = req.query;
-    const id = channelId;
-    const authHeader = req.headers.authorization;
-    const accessToken = authHeader.split(" ")[1];
 
-    const payload = decodeToken(accessToken);
-    const uid = payload.did;
-    const userData = await getUserDataByUId(uid);
-    const follower_id = userData.profile_id;
-
-    // Insert a new follow into the follows table
-    const { data, error } = await supabase
-      .from("user_follows")
-      .insert([
-        {
-          follower_id,
-          followee_id: id
-        }
-      ]);
-
-    if (error) {
-      console.error("Error adding follow:", error);
-      return res.status(500).json({ error: "Error adding follow" });
-    }
     return res.status(200).json({});
   }
   else {

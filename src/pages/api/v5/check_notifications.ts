@@ -1,4 +1,4 @@
-import { UpdateUserInfo, allowedOrigins, decodeToken, getUserDataByUId } from '../api-utils';
+import { UpdateUserInfo, allowedOrigins } from '../api-utils';
 
 export default async function handler(req, res) {
     // Set CORS headers

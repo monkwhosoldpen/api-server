@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { notificationsData } from "../../../../data/mockdata";
-import { allowedOrigins, decodeToken, getUserDataByUId, supabase } from "../../api-utils";
+import { allowedOrigins } from "../../api-utils";
 
 
 export default async function handler(req, res) {
@@ -32,8 +31,6 @@ export default async function handler(req, res) {
             // const payload = decodeToken(accessToken);
 
             // const uid = payload.did;
-            // const userData = await getUserDataByUId(uid);
-
             // const user = userData || {};
 
             // let follows = [];

@@ -2,12 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { allNFTSData1 } from "../../../../data/mockdata";
 
-// Initialize the Supabase client with your Supabase URL and API Key
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 
 export default async function handler(
     req: NextApiRequest,
@@ -36,16 +30,3 @@ export default async function handler(
         return res.status(500).json({ error: "An unexpected error occurred" });
     }
 }
-
-const getNftItems = async (profile_id, tab_type) => {
-
-    const { data: nftItems, error: nftError } = await supabase
-        .from("nfts")
-        .select()
-        .eq("profile_id", profile_id);
-
-    if (nftError) {
-        throw new Error("Error fetching NFT items");
-    }
-    return nftItems || [];
-};

@@ -1,4 +1,5 @@
-import { allowedOrigins, supabase } from "../../../api-utils";
+// import { allowedOrigins, supabase } from "../../../api-utils";
+import { allowedOrigins, supabaseAnon } from "@pages/api/api-utils";
 import { mockUserMe } from "../../../../../data/mockdata";
 
 export default async function handler(req, res) {
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
             }
         };
 
-        const { data: userProfile, } = await supabase
+        const { data: userProfile, } = await supabaseAnon
             .from('user_profiles')
             .select('*')
             .eq('username', channelId || 'elonmusk')
@@ -71,9 +72,8 @@ export default async function handler(req, res) {
             : { ...mockUserMe.data.profile };
 
         let res1 = mockChannelInfo;
-
-        res1 =
-        {
+        
+        res1 = {
             ...modifiedOwner,
             spotify_artist_id: "1L0eYtrSxuk6bhdupdVFpH",
             apple_music_artist_id: "1489534572",

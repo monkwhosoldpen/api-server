@@ -2,11 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { creatorAirdropsEditionData } from "../../../../../data/mockdata";
 
-// Initialize the Supabase client with your Supabase URL and API Key
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(
     req: NextApiRequest,
