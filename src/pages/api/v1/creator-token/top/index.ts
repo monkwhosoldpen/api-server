@@ -1,4 +1,7 @@
 import { allowedOrigins, supabase } from "@pages/api/api-utils";
+import { allNFTSData1 } from "../../../../../data/mockdata";
+// import PocketBase from 'pocketbase';
+// const pb = new PocketBase('https://grew-faster.pockethost.io');
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -17,21 +20,16 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    // await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'letmeenter@12345');
+
     if (req.method === 'GET') {
+        
         const { data: userProfiles, error } = await supabase
         .from('user_profiles') // Replace 'user_profiles' with your actual table name
-        .select('*')
-        // .eq('verified', true)
-        // .eq('is_party', false)
-        // // .eq('is_demo', false)
-        .eq('is_secondary_stream', false);  
+        .select('*');  
 
-        if (error) {
-            // Handle the error
-            return res.status(500).json({ error: 'An unexpected error occurred' });
-        }
         const topCreatorTokenResponse = {
-            creator_tokens: [...userProfiles,]
+            creator_tokens: [...userProfiles || [],]
         };
         res.status(200).json(topCreatorTokenResponse);
     }
