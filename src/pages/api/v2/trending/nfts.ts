@@ -1,37 +1,27 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { createClient } from "@supabase/supabase-js";
+import { allowedOrigins } from '@pages/api/api-utils';
 import { allNFTSData1 } from '../../../../data/mockdata';
 
+export default async function handler(req, res) {
+    // Set CORS headers
+    const origin = req.headers.origin;
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
-    try {
-        if (req.method === "GET") {
-            // const { data, error } = await supabase.rpc("get_nfts_with_owners");
-            // if (error) {
-            //     return res.status(500).json({ error: "Error executing query" });
-            // }
-            // const response = data.map(ele => {
-            //     return {
-            //         ...ele,
-            //         // ...allNFTSData1[0]
-            //         chain_name: 'dontknow',
-            //         contract_address: '0xbE853d21cEC138Ae8513291674d93659d742fc9e',
-            //         token_id: ele.nft_id,
-            //         creator_username: 'dontknow',
-            //         creator_name: 'dontknow',
-            //         slug: "throwback-to-my-first-ai-drop",
-            //         username: 'creator_username'
-            //     };
-            // })
-            return res.status(200).json(allNFTSData1);
-        } else {
-            return res.status(405).json({ error: "Method not allowed" });
-        }
-    } catch (error) {
-        console.error("An unexpected error occurred:", error);
-        return res.status(500).json({ error: "An unexpected error occurred" });
+    // Set CORS headers
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    // Handle OPTIONS request for preflight check
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (req.method === "GET") {
+        return res.status(200).json(allNFTSData1);
+    }
+    else {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 }
