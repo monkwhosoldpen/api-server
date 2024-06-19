@@ -1,25 +1,27 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { creatorAirdropsEditionData } from "../../../../../data/mockdata";
+import { allowedOrigins } from '@pages/api/api-utils';
+import { creatorAirdropsEditionData } from '../../../../../data/mockdata';
 
+export default async function handler(req, res) {
+    // Set CORS headers
+    const origin = req.headers.origin;
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
-    try {
-        if (req.method === "GET") {
-            // const userData = await GetUserInfo(req);
-            // // If userData is null, it means the user is not found in Supabase
-            // const user = userData || {};
-            return res.status(200).json(creatorAirdropsEditionData);
-        }
-        else {
-            return res.status(405).json({ error: "Method not allowed" });
-        }
-    } catch (error) {
-        console.error("An unexpected error occurred:", error);
-        return res.status(500).json({ error: "An unexpected error occurred" });
+    // Set CORS headers
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    // Handle OPTIONS request for preflight check
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (req.method === "GET") {
+        return res.status(200).json(creatorAirdropsEditionData);
+    }
+    else {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 }
-
