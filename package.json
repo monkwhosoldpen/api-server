@@ -19,6 +19,7 @@
     "hcaptcha": "*",
     "html-react-parser": "^3.0.4",
     "jsonwebtoken": "*",
+    "web-push": "^3.6.3",
     "luxon": "*",
     "multiparty": "*",
     "next": "13.0.5",
