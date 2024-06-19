@@ -8,7 +8,7 @@ export default async function handler(
 ) {
     try {
         if (req.method === "POST") {
-            const userData = await UpdateUserInfo(req);
+            // const userData = await UpdateUserInfo(req);
             // If userData is null, it means the user is not found in Supabase
             const userResponse = {
                 data: {
