@@ -1,81 +1,49 @@
-import zulipInit from 'zulip-js';
 import { Rettiwt } from 'rettiwt-api';
 import { allowedOrigins, supabaseAnon } from '../api-utils';
+import fetch from 'node-fetch'; // Ensure fetch is available in your environment
+const rettiwt = new Rettiwt();
 
-const apiKey = 'a2R0PVV5dW1DeTZuU1dsQUNMVG9oNmdjSDBYQ3dETzFuWVJ6NHhzQ2ZjdGw7dHdpZD0idT0xNjU1MzEyMTA4NDc5NzU4MzM4IjtjdDA9YTZkYTllZDVkODRmMjFiMmVhMTIxZjE0YjMzYjZjMTI7YXV0aF90b2tlbj1hZDQ0YzY1ZmMyMjhlZjgyZWIxZTMyYmI1NDYyM2Q3Mjc4MTQ4MGU3Ow==';// await authenticate(email, username, password);
-const rettiwt = new Rettiwt({ apiKey: apiKey });
+const mockUsernames = [
+  'elonmusk',
+  'BarackObama',
+  'katyperry',
+  'rihanna',
+  'Cristiano',
+  'taylorswift13',
+  'ladygaga',
+  'narendramodi',
+  'TheEllenShow',
+  'realdonaldtrump'
+];
 
 export default async function handler(req, res) {
   // Set CORS headers
   const origin = req.headers.origin;
 
-  // Set CORS headers
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
+  // const url_ = 'https://pbs.twimg.com/media/Fh0bPd7VQAAU31D.jpg';
+  // saveImageToSupabase(url_);
+  // uploadImageToSupabase(url_);
   // Handle OPTIONS request for preflight check
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  const usernames = ['elonmusk', 'nasa', 'BillGates'];
-  const stream_id = '';
-  const username = '';
-  await main(username, stream_id);
-
-  // await updateZulipData(premium_user_username2);
-  return res.status(200).json({
-    "content": "Hey, we just updated **something** from Twitter -- Supabase!" + stream_id + username
-  });
-}
-
-// Example async function to send a notification, replace with your actual notification API call
-async function sendNotificationAsync(data) {
-  // Placeholder for your notification API call logic
-  // For example:
-  await fetch('https://push.netaconnect.com/api/push', { method: 'GET' });
-  console.log("Sending notification with data:", data);
-}
-
-async function fetchTweets(usernames) {
-  const rettiwt = new Rettiwt();
-
   try {
-    // Log in and get the API key
-    const apiKey = await rettiwt.auth.login('ashwathbharadwaj.se@gmail.com', 'moongodspeaks', 'Ashu@7569');
-    console.log(apiKey); // Ideally, you wouldn't log the API key in production
+    // Use mock usernames for now
+    const results = await main(mockUsernames);
 
-    // Iterate over each username
-    for (const username of usernames) {
-      // Fetch user details to get the userId
-      const userDetails = await rettiwt.user.details(username);
-      console.log(userDetails); // Display user details
-
-      // Assuming you get userId from userDetails, and Rettiwt's timeline method supports parameters for batching and date filtering
-      const userId = userDetails.id; // This is an assumption; replace with actual way to get userId from userDetails
-
-      // Fetch and log the timeline for the user
-      // Note: Adjust parameters according to the actual API capabilities for batching and date filtering
-      const timeline = await rettiwt.user.timeline(userId);
-      console.log({ username, timeline });
-    }
+    return res.status(200).json({
+      content: "Hey, we just updated **something** from Twitter -- Supabase!",
+      results,
+    });
   } catch (error) {
-    console.error(error);
-  }
-}
-
-async function authenticate(email, username, password) {
-  try {
-    const apiKey = await rettiwt.auth.login(email, username, password);
-    console.log('Authenticated successfully.');
-    return apiKey;
-  } catch (error) {
-    console.error('Authentication failed:', error);
-    return null;
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -83,77 +51,139 @@ async function fetchUserDetails(username) {
   try {
     const userDetails = await rettiwt.user.details(username);
     console.log(`${username} details:`, userDetails);
-    return userDetails; // Return the user details for further use
+    return userDetails;
   } catch (error) {
     console.error(`Failed to fetch details for ${username}:`, error);
     throw new Error(`Failed to fetch details for ${username}`);
   }
 }
 
-async function fetchUserTimeline(userId, userName) {
-  try {
-    const response = await rettiwt.user.timeline(userId); // Fetch the timeline
-    const tweets = response.list; // Access the tweets directly from the 'list' property
+async function fetchUserTimeline(userId) {
+  // try {
+  //   const response = await rettiwt.user.timeline(userId);
+  //   const tweets = response.list;
 
-    console.log(`Timeline for User ID: ${userId}:`);
-
-    // Iterate over each tweet in the list
-    tweets.forEach(tweet => {
-      // Extract the required information
-      const { createdAt, fullText, id } = tweet;
-      // Print in a structured format
-      console.log(`Tweet ID: ${id}`);
-      console.log(`Created At: ${createdAt}`);
-      console.log(`Text: ${fullText}`);
-      console.log('-----------------------------------');
-
-      manipulateMessage(createdAt, fullText, id, userName);
-    });
-
-    return response; // Return the response for further processing if necessary
-  } catch (error) {
-    console.error(`Failed to fetch timeline for User ID: ${userId}:`, error);
-    throw new Error(`Failed to fetch timeline for User ID: ${userId}`);
-  }
+  //   console.log(`Timeline for User ID: ${userId}:`);
+  //   tweets.forEach(tweet => {
+  //     const { createdAt, fullText, id } = tweet;
+  //     console.log(`Tweet ID: ${id}`);
+  //     console.log(`Created At: ${createdAt}`);
+  //     console.log(`Text: ${fullText}`);
+  //     console.log('-----------------------------------');
+  //   });
+  //   return response;
+  // } catch (error) {
+  //   console.error(`Failed to fetch timeline for User ID: ${userId}:`, error);
+  //   throw new Error(`Failed to fetch timeline for User ID: ${userId}`);
+  // }
 }
 
-// Define a function to handle the fetching of user details and timeline for a single username
 async function handleUsername(targetUsername) {
   try {
-    // Fetch user details
     const userDetails = await fetchUserDetails(targetUsername);
+    const {
+      profileBanner,
+      profileImage,
+      createdAt,
+      userName,
+      isVerified,
+      fullName,
+      followersCount,
+      description,
+      location,
+      id
+    } = userDetails;
+
+    const profileImageUrl = await saveImageToSupabase(profileImage);
+    const profileBannerUrl = await saveImageToSupabase(profileBanner);
+
+    await saveGoatProfile(userName, { profileImageUrl, profileBannerUrl, description, fullName, location, isVerified });
+
     if (userDetails && userDetails.id) {
-      // Fetch user timeline if the ID exists
-      await fetchUserTimeline(userDetails.id, userDetails.userName);
-      console.log(`Fetched timeline for ${targetUsername}`);
+      const timeline = await fetchUserTimeline(userDetails.id);
+      console.log(`Fetched timeline for ${userName}`);
+      return { userDetails, timeline };
     } else {
-      console.log(`User details for ${targetUsername} did not include an ID.`);
+      console.log(`User details for ${userName} did not include an ID.`);
+      return null;
     }
   } catch (error) {
     console.error(error.message);
+    return null;
   }
 }
 
-// Example usage with your array of targetUsernames
-async function main(username, stream_id) {
-  const targetUsernames = ['rahulgandhi'];
+async function saveGoatProfile(username, {profileImageUrl, profileBannerUrl, description, fullName, location, isVerified}) {
+  const { error } = await supabaseAnon
+    .from('user_profiles')
+    .upsert({
+      'username': username,
+      'img_url': { url: profileImageUrl },
+      'cover_url': { url: profileBannerUrl },
+      'description': description || "NA",
+      'full_name': fullName || "NA",
+      'location': location || "NA",
+      'verified': isVerified || false,
+    }, { onConflict: 'username' });
+
+  if (error) {
+    console.error('Error saving user profile:', error);
+  } else {
+    console.log('Profile saved successfully');
+  }
+}
+
+async function main(targetUsernames) {
+  const results = [];
   for (const targetUsername of targetUsernames) {
-    // Handle each username by calling the separate function
-    await handleUsername(targetUsername);
+    const result = await handleUsername(targetUsername);
+    // if (result) {
+    //   // Process tweets and replace image URLs
+    //   // for (const tweet of result.timeline.list) {
+    //   //   if (tweet.entities && tweet.media && tweet.media.length > 0) {
+    //   //     for (const media of tweet.media) {
+    //   //       if (media.url) {
+    //   //         const supabaseImageUrl = await saveImageToSupabase(media.url);
+    //   //         media.url = supabaseImageUrl;
+    //   //       }
+    //   //     }
+    //   //   }
+    //   // }
+    //   results.push(result);
+    // }
   }
+  return results;
 }
 
-async function manipulateMessage(createdAt, fullText, id, username) {
-  const sample = [{ source: "TWITTER", timestamp: createdAt, content: fullText, message_id: id, username: username }];
+async function saveImageToSupabase(imageUrl: string): Promise<string | null> {
   try {
-    const { data: updatedData, error } = await supabaseAnon
-      .from('zulip_messages') // Replace 'your_table_name' with your Supabase table name
-      .upsert(sample, { onConflict: ['message_id'] as any, ignoreDuplicates: true }); // Cast 'uid' as 'any'
+    const response = await fetch(imageUrl);
+    const buffer = await response.buffer();
+    const fileName = `${Date.now()}-${imageUrl.split('/').pop()}`;
+    const fileType = response.headers.get('content-type');
+
+    // Upload the file to Supabase
+    const { data, error } = await supabaseAnon.storage
+      .from('twitter_images') // Ensure this bucket is created in Supabase
+      .upload(fileName, buffer, {
+        contentType: fileType,
+        cacheControl: '3600',
+        upsert: false,
+      });
+
     if (error) {
-      throw error;
+      throw new Error(`Failed to upload image to Supabase: ${error.message}`);
     }
-    return updatedData;
+
+    const publicUrlResponse: any = await supabaseAnon.storage
+      .from('twitter_images')
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicUrlResponse.data?.publicUrl || '';
+
+    return publicUrl;
   } catch (error) {
-    throw error;
+    console.error(`Failed to save image from URL: ${imageUrl}`, error);
+    return null;
   }
 }

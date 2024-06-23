@@ -37,13 +37,20 @@ export default async function handler(req, res) {
                 console.error('No data found in follows');
                 return res.status(404).json({ error: 'No data found' });
             }
-            const follows_ = follows.map((usernameObj) => ({
-                ...joinedChannelsData[0],
-                username: usernameObj.followee_id,
-            }));
+            const followeeIds = follows.map((follow) => follow.followee_id);
+
+            const { data: profiles, error: profilesError } = await supabaseAnon
+                .from('user_profiles')  // Replace 'user_profiles' with your actual profiles table
+                .select('*')
+                .in('username', followeeIds);
+
+            if (profilesError) {
+                console.error('Supabase error:', profilesError);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
             const topCreatorTokenResponse = {
-                creator_tokens: follows_,
-                follows: follows_
+                creator_tokens: profiles,
             };
             res.status(200).json(topCreatorTokenResponse);
         }
@@ -55,11 +62,9 @@ export default async function handler(req, res) {
         }
     }
     else if (req.method === "POST") {
-        // Constructing the response structure
         const response = {
             data: {
-                profile: { ...({} || {}) },
-                // Add more properties here if needed
+                profile: {},
             },
         };
         return res.status(200).json(response);
