@@ -1,11 +1,11 @@
-import { allowedOrigins } from '../../../api-utils';
-import { mockChannelMessageData, mockUserMe } from '../../../../../data/mockdata';
+import { allowedOrigins, supabaseAnon } from '../../../api-utils';
+import { createClient } from '@supabase/supabase-js';
+import { mockChannelMessageData } from '../../../../../data/mockdata';
 
 export default async function handler(req, res) {
   // Set CORS headers
   const origin = req.headers.origin;
 
-  // Set CORS headers
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
@@ -19,31 +19,45 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "GET") {
-
     let { page, limit, channelId } = req.query;
-    // Ensure `page` and `limit` are treated as single string values.
-    // If they are arrays, take the first element; otherwise, take them as they are.
+
     const parsedPage = parseInt(Array.isArray(page) ? page[0] : page) || 1;
     const parsedLimit = parseInt(Array.isArray(limit) ? limit[0] : limit) || 20;
 
-    // const { data: userProfile } = await supabase
-    //   .from('user_profiles')
-    //   .select('*')
-    //   // Use ilike for case-insensitive comparison
-    //   .ilike('username', `%${channelId as string}%`)
-    //   .limit(1);
+    console.log(channelId);
 
-    return res.status(200).json(mockChannelMessageData);
+    // Fetch messages from Supabase
+    let { data: messages, error } = await supabaseAnon
+      .from('zulip_messages')
+      .select('*')
+      .eq('username', channelId)
+      .range((parsedPage - 1) * parsedLimit, parsedPage * parsedLimit - 1);
 
-    // if (channelId == 'johndoe') {
-    //   return res.status(200).json(mockChannelMessageData);
-    // }
-    // else {
-    //   return res.status(200).json(response_send);
-    // }
+    if (error) {
+      return res.status(500).json({ error: 'Error fetching messages' });
+    }
+    
+    // Format messages like the sample message at index 0
+    const formattedMessages = messages.map(message => {
+      return {
+        channel_message: {
+          id: message.message_id,
+          created_at: message.timestamp,
+          updated_at: message.timestamp,
+          is_payment_gated: false,
+          body: message.content.text,
+          body_text_length: 243,
+          sent_by: {
+            admin: true,
+            profile: [Object]
+          }
+        },
+        read: true
+      }
+    });
 
-  }
-  else {
+    return res.status(200).json(formattedMessages);
+  } else {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 }

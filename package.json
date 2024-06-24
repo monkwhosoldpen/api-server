@@ -12,6 +12,7 @@
     "@supabase/supabase-js": "*",
     "airtable": "*",
     "api": "^6.1.1",
+    "apify-client": "^2.9.3",
     "axios": "^1.4.0",
     "base64-arraybuffer": "*",
     "bcrypt": "^5.1.0",
@@ -19,7 +20,6 @@
     "hcaptcha": "*",
     "html-react-parser": "^3.0.4",
     "jsonwebtoken": "*",
-    "web-push": "^3.6.3",
     "luxon": "*",
     "multiparty": "*",
     "next": "13.0.5",
@@ -33,6 +33,7 @@
     "rettiwt-api": "^2.5.2",
     "supabase": "^1.50.11",
     "superjson": "^1.11.0",
+    "web-push": "^3.6.3",
     "zod": "^3.19.1",
     "zulip-js": "*",
     "zustand": "^4.1.4"
@@ -52,8 +53,8 @@
     "autoprefixer": "^10.4.13",
     "eslint": "^8.28.0",
     "eslint-config-next": "^13.0.5",
-    "postcss": "^8.4.19",
     "pocketbase": "*",
+    "postcss": "^8.4.19",
     "tailwindcss": "^3.2.4",
     "typescript": "5.3.3"
   }

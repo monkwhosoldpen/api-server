@@ -4,16 +4,36 @@ import fetch from 'node-fetch'; // Ensure fetch is available in your environment
 const rettiwt = new Rettiwt();
 
 const mockUsernames = [
-  'elonmusk',
-  'BarackObama',
   'katyperry',
+  'justinbieber',
+  'barackobama',
   'rihanna',
-  'Cristiano',
   'taylorswift13',
   'ladygaga',
+  'cristiano',
+  'elonmusk',
+  'realdonaldtrump',
+  'youtube',
+  'kimkardashian',
+  'arianagrande',
+  'selenagomez',
+  'twitter',
+  'cnnbrk',
   'narendramodi',
-  'TheEllenShow',
-  'realdonaldtrump'
+  'nytimes',
+  'shakira',
+  'jimmyfallon',
+  'oprah',
+  'ddlovato',
+  'bbcbreaking',
+  'jlo',
+  'kingjames',
+  'theellenshow',
+  'espn',
+  'britneyspears',
+  'mileycyrus',
+  'billgates',
+  'drake'
 ];
 
 export default async function handler(req, res) {
@@ -59,23 +79,65 @@ async function fetchUserDetails(username) {
 }
 
 async function fetchUserTimeline(userId) {
-  // try {
-  //   const response = await rettiwt.user.timeline(userId);
-  //   const tweets = response.list;
+  try {
+    const response = await rettiwt.user.timeline(userId);
+    const tweets = response.list;
 
-  //   console.log(`Timeline for User ID: ${userId}:`);
-  //   tweets.forEach(tweet => {
-  //     const { createdAt, fullText, id } = tweet;
-  //     console.log(`Tweet ID: ${id}`);
-  //     console.log(`Created At: ${createdAt}`);
-  //     console.log(`Text: ${fullText}`);
-  //     console.log('-----------------------------------');
-  //   });
-  //   return response;
-  // } catch (error) {
-  //   console.error(`Failed to fetch timeline for User ID: ${userId}:`, error);
-  //   throw new Error(`Failed to fetch timeline for User ID: ${userId}`);
-  // }
+    console.log(`Timeline for User ID: ${userId}:`);
+    for (const tweet of tweets) {
+      const { createdAt, fullText, id, tweetBy } = tweet;
+      console.log(`Tweet ID: ${id}`);
+      console.log(`Created At: ${createdAt}`);
+      console.log(`Text: ${fullText}`);
+      console.log('-----------------------------------');
+
+      // Insert tweet into zulip_messages table
+      const { data, error } = await supabaseAnon
+        .from('zulip_messages')
+        .insert([
+          {
+            message_id: id, // or use a sequence to auto-generate the ID
+            uid: userId,
+            username: tweetBy.userName, // Replace with the actual username
+            sender_id: userId, // or another relevant ID
+            source: 'twitter',
+            content: { text: fullText },
+            translated_content: null,
+            message_url: null,
+            recipient_id: null,
+            timestamp: createdAt,
+            edit_history: null,
+            client: 'rettiwt',
+            subject: null,
+            is_me_message: false,
+            sender_full_name: 'Full Name', // Replace with the actual full name
+            sender_email: 'email@example.com', // Replace with the actual email
+            sender_realm_str: 'realm', // Replace with the actual realm
+            display_recipient: null,
+            type: 'stream',
+            stream_id: null,
+            avatar_url: null,
+            flags: null,
+            content_type: 'text',
+            submessages: null,
+            reactions: null,
+            topic_links: null,
+            last_edit_timestamp: null,
+          }
+        ]);
+
+      if (error) {
+        console.error('Supabase insert error:', error);
+      } else {
+        console.log('Message inserted:', data);
+      }
+    }
+
+    return response;
+  } catch (error) {
+    console.error(`Failed to fetch timeline for User ID: ${userId}:`, error);
+    throw new Error(`Failed to fetch timeline for User ID: ${userId}`);
+  }
 }
 
 async function handleUsername(targetUsername) {
