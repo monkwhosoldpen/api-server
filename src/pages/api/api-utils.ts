@@ -2,10 +2,23 @@ import { createClient } from "@supabase/supabase-js";
 import jwt from "jsonwebtoken";
 import { mockUser, mockUserMe } from "../../data/mockdata";
 
-const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://pylhvrqhogloubzygehi.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bGh2cnFob2dsb3VienlnZWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg0ODU5NTEsImV4cCI6MjAzNDA2MTk1MX0.BVqMLmZf_6_aPWGt59EpC9oLvkVmAFQ_6jmgVSjdlWo';
-const service_role_key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bGh2cnFob2dsb3VienlnZWhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxODQ4NTk1MSwiZXhwIjoyMDM0MDYxOTUxfQ.cqA7R4vXx13pHCwK1Duy9MNvm53BaVuVQGYJn64Rbek';
-export const JWT_SECRET = process.env.NEXT_PUBLIC_SUPABASE_JWT_SECRET || 'oGxKu10cXVoxAnz/tDPiAC30fi58nNtMb2Dn5AiqyYwWwdvbi8MqWhct5KubflaBTvsU77az1+mgoAwN6cxPxg==';
+const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://iuqlvszkpbexblscnpay.supabase.co";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cWx2c3prcGJleGJsc2NucGF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUwOTMwMDAsImV4cCI6MjA0MDY2OTAwMH0.VlQG9CG1s4m9ZLFcFH_W6E2VpWNHtVftKdvRGIWZz6Y";
+const service_role_key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cWx2c3prcGJleGJsc2NucGF5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNTA5MzAwMCwiZXhwIjoyMDQwNjY5MDAwfQ.ckanGyem0hVF9ub9IN3UxnaqgOC2ttFZ5Ifa5WQdh4E';
+export const JWT_SECRET = process.env.NEXT_PUBLIC_SUPABASE_JWT_SECRET || 'LaSV5x4LCxHwKz9UDedXSk+PooG5wxHtecwBIPD/bY8uUjGF9QXIhYiQBKm0qdp/FWcOLesCJZQdLld4em5gPQ==';
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    console.warn('Warning: Using fallback value for NEXT_PUBLIC_SUPABASE_URL');
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn('Warning: Using fallback value for NEXT_PUBLIC_SUPABASE_ANON_KEY');
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('Warning: Using fallback value for NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY');
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_JWT_SECRET) {
+    console.warn('Warning: Using fallback value for NEXT_PUBLIC_SUPABASE_JWT_SECRET');
+}
 
 export const supabase = createClient(supabase_url, service_role_key);
 export const supabaseAnon = createClient(supabase_url, supabaseKey);
