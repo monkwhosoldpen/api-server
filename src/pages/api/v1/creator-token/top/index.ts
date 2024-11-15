@@ -23,10 +23,19 @@ export default async function handler(req, res) {
     // await pb.admins.authWithPassword('monkwhosoldpen@gmail.com', 'letmeenter@12345');
 
     if (req.method === 'GET') {
+        // Extract category from query parameters
+        const { category } = req.query;
+        console.log('Category:', category);
         
         const { data: userProfiles, error } = await supabase
-        .from('user_profiles') // Replace 'user_profiles' with your actual table name
-        .select('*');  
+            .from('user_profiles')
+            .select('*')
+            .eq('type', category);
+
+        if (error) {
+            console.error('Error fetching user profiles:', error);
+            return res.status(500).json({ error: 'Failed to fetch user profiles' });
+        }
 
         const topCreatorTokenResponse = {
             creator_tokens: [...userProfiles || [],]
